@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Dashboard - KGISL Portal</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="admin-meta" style="background: #333; color: white;">
+        <span>KGISL Portal - Faculty Access</span>
+        <span>View All Student Results</span>
+    </div>
+    <div class="main-container">
+        <header class="header">
+            <div class="college-info">
+                <h1>Faculty Dashboard</h1>
+                <p>KGISL Institute of Technology - Departmental View</p>
+            </div>
+            <div class="student-meta">
+                <span class="name">Faculty Member</span>
+                <a href="index.html" class="logout-btn">LOGOUT</a>
+            </div>
+        </header>
+
+        <!-- View Selectors (Matching Admin Style) -->
+        <div class="admin-form-card" style="margin-top: 30px;">
+            <h3 style="margin-bottom: 15px; color: var(--primary-green); text-align: left;">SELECT ACADEMIC YEAR</h3>
+            <div class="role-selector" style="margin-bottom: 20px;">
+                <div class="role-tab active" onclick="setYear(1, this)">1st YEAR</div>
+                <div class="role-tab" onclick="setYear(2, this)">2nd YEAR</div>
+                <div class="role-tab" onclick="setYear(3, this)">3rd YEAR</div>
+                <div class="role-tab" onclick="setYear(4, this)">4th YEAR</div>
+            </div>
+
+            <h3 style="margin-bottom: 15px; color: var(--primary-green); text-align: left;">SELECT SEMESTER</h3>
+            <div id="sem-selector" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px;">
+                <button class="action-btn secondary-btn sem-btn active" onclick="setSem(1, this)">SEM 1</button>
+                <button class="action-btn secondary-btn sem-btn" onclick="setSem(2, this)">SEM 2</button>
+                <button class="action-btn secondary-btn sem-btn" onclick="setSem(3, this)">SEM 3</button>
+                <button class="action-btn secondary-btn sem-btn" onclick="setSem(4, this)">SEM 4</button>
+                <button class="action-btn secondary-btn sem-btn" onclick="setSem(5, this)">SEM 5</button>
+                <button class="action-btn secondary-btn sem-btn" onclick="setSem(6, this)">SEM 6</button>
+                <button class="action-btn secondary-btn sem-btn" onclick="setSem(7, this)">SEM 7</button>
+                <button class="action-btn secondary-btn sem-btn" onclick="setSem(8, this)">SEM 8</button>
+            </div>
+
+            <h3 style="margin-bottom: 15px; color: var(--primary-green); text-align: left;">SELECT DEPARTMENT</h3>
+            <div id="dept-selector" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 5px;">
+                <button class="action-btn secondary-btn dept-btn active"
+                    onclick="setDept('B.E. Computer Science and Engineering', this)">B.E. CSE</button>
+                <button class="action-btn secondary-btn dept-btn"
+                    onclick="setDept('B.E. Electronics and Communication Engineering', this)">B.E. ECE</button>
+                <button class="action-btn secondary-btn dept-btn"
+                    onclick="setDept('B.E. Mechanical Engineering', this)">B.E. Mechanical</button>
+                <button class="action-btn secondary-btn dept-btn"
+                    onclick="setDept('B.Tech Artificial Intelligence and Data Science', this)">B.Tech AI&DS</button>
+                <button class="action-btn secondary-btn dept-btn"
+                    onclick="setDept('B.Tech Computer Science and Business Systems', this)">B.Tech CSBS</button>
+                <button class="action-btn secondary-btn dept-btn"
+                    onclick="setDept('B.Tech Information Technology', this)">B.Tech IT</button>
+                <button class="action-btn secondary-btn dept-btn"
+                    onclick="setDept('B.E. CSE (Artificial Intelligence and Machine Learning)', this)">B.E. CSE
+                    (AI&ML)</button>
+                <button class="action-btn secondary-btn dept-btn"
+                    onclick="setDept('B.E. CSE (Cybersecurity)', this)">B.E. Cybersecurity</button>
+            </div>
+        </div>
+
+        <div class="dashboard-actions" style="margin-top: 20px;">
+            <div class="search-bar">
+                <input type="text" id="faculty-search" placeholder="Search by Roll Number or Name..."
+                    onkeyup="filterStudents()">
+            </div>
+        </div>
+
+        <!-- Performance Analysis Summary -->
+        <div class="analysis-container" id="analysis-section">
+            <div class="analysis-card">
+                <div class="label">Total Students</div>
+                <div class="value" id="stat-total-students">0</div>
+            </div>
+            <div class="analysis-card pass-rate" id="pass-rate-card">
+                <div class="label">Overall Pass %</div>
+                <div class="value" id="stat-pass-percentage">0%</div>
+            </div>
+            <div class="analysis-card avg-sgpa">
+                <div class="label">Class Average SGPA</div>
+                <div class="value" id="stat-avg-sgpa">0.00</div>
+            </div>
+        </div>
+
+        <div class="title-bar" id="selection-summary">1st YEAR - SEM 1 - B.E. CSE</div>
+
+        <div class="results-table-container">
+            <table id="faculty-results-table">
+                <thead>
+                    <tr>
+                        <th>Roll No</th>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>SGPA</th>
+                        <th>CGPA</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody id="faculty-body">
+                    <!-- Students list -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal for student details -->
+    <div id="details-modal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div class="main-container" style="max-width: 800px; margin: 0; position:relative;">
+            <button onclick="closeModal()"
+                style="position:absolute; right:20px; top:20px; font-size:2rem; background:none; border:none; color:white; cursor:pointer;">&times;</button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const allData = JSON.parse(localStorage.getItem('kgisl_results') || '[]');
+        let currentYear = 1;
+        let currentSem = 1;
+        let currentDept = 'B.E. Computer Science and Engineering';
+
+        function setYear(year, element) {
+            currentYear = parseInt(year);
+            document.querySelectorAll('.role-selector .role-tab').forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+            updateSummary();
+            filterStudents();
+        }
+
+        function setSem(sem, element) {
+            currentSem = parseInt(sem);
+            document.querySelectorAll('.sem-btn').forEach(b => b.classList.remove('active'));
+            element.classList.add('active');
+            updateSummary();
+            filterStudents();
+        }
+
+        function setDept(dept, element) {
+            currentDept = dept;
+            document.querySelectorAll('.dept-btn').forEach(b => b.classList.remove('active'));
+            element.classList.add('active');
+            updateSummary();
+            filterStudents();
+        }
+
+        function updateSummary() {
+            const summary = document.getElementById('selection-summary');
+            if (summary) summary.innerText = `${currentYear}${currentYear === 1 ? 'st' : currentYear === 2 ? 'nd' : currentYear === 3 ? 'rd' : 'th'} YEAR - SEM ${currentSem} - ${currentDept}`;
+        }
+
+        function calculateGPA(subjects) {
+            if (!subjects || subjects.length === 0) return "0.00";
+            let totalPoints = 0;
+            let totalCredits = 0;
+            subjects.forEach(sub => {
+                const credit = parseFloat(sub.credit) || 0;
+                const gp = parseFloat(sub.gp) || 0;
+                totalPoints += (credit * gp);
+                totalCredits += credit;
+            });
+            return totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : "0.00";
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('faculty-body');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 40px; color: #777;">
+                    <strong>NO RESULTS FOUND FOR THIS CATEGORY</strong><br>
+                    Please adjust your selection (Year, SEM, Dept) or search query.
+                </td></tr>`;
+                return;
+            }
+
+            data.forEach(student => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 700;">${student.roll}</td>
+                    <td>${student.name}</td>
+                    <td>${student.course || 'N/A'}</td>
+                    <td style="color: var(--primary-green); font-weight: 700;">${student.sgpa || '0.00'}</td>
+                    <td style="color: var(--primary-dark); font-weight: 700;">${student.cgpa || '0.00'}</td>
+                    <td><button onclick="viewDetails('${student.roll}')" class="action-btn secondary-btn" style="padding: 5px 10px; font-size: 0.8rem; background: #e0f2f1; color: #00695c; border-color: #00695c;">View Marksheet</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterStudents() {
+            const query = document.getElementById('faculty-search').value.toLowerCase();
+            const filtered = allData.filter(s => {
+                const matchesCategory = (Number(s.year) === currentYear && s.dept === currentDept);
+                const hasSemData = s.subjects.some(sub => Number(sub.sem) === currentSem);
+                const matchesQuery = s.roll.toLowerCase().includes(query) || s.name.toLowerCase().includes(query);
+
+                return matchesCategory && hasSemData && matchesQuery;
+            });
+
+            // Performance Analysis Calculations
+            let totalStudents = filtered.length;
+            let passCount = 0;
+            let totalSGPA = 0;
+
+            filtered.forEach(student => {
+                const semesterSubjects = student.subjects.filter(sub => Number(sub.sem) === currentSem);
+                const isPass = semesterSubjects.every(sub => sub.result === 'PASS' || (sub.grade && sub.grade !== 'RA' && sub.grade !== 'AB'));
+                if (isPass) passCount++;
+
+                const sgpa = parseFloat(student.sgpa) || 0;
+                totalSGPA += sgpa;
+            });
+
+            const passPercentage = totalStudents > 0 ? ((passCount / totalStudents) * 100).toFixed(1) : "0.0";
+            const avgSGPA = totalStudents > 0 ? (totalSGPA / totalStudents).toFixed(2) : "0.00";
+
+            // Update UI
+            document.getElementById('stat-total-students').innerText = totalStudents;
+            document.getElementById('stat-pass-percentage').innerText = passPercentage + "%";
+            document.getElementById('stat-avg-sgpa').innerText = avgSGPA;
+
+            // Update color coding for pass percentage
+            const passCard = document.getElementById('pass-rate-card');
+            passCard.classList.remove('medium', 'low');
+            if (parseFloat(passPercentage) < 50) passCard.classList.add('low');
+            else if (parseFloat(passPercentage) < 75) passCard.classList.add('medium');
+
+            renderTable(filtered);
+        }
+
+        let currentViewingStudent = null;
+
+        function renderStudentDetails(selectedSem) {
+            if (!currentViewingStudent) return;
+
+            const semesterSubjects = currentViewingStudent.subjects.filter(s => s.sem == selectedSem);
+            const sgpa = calculateGPA(semesterSubjects);
+            const allSubjectsUpToNow = currentViewingStudent.subjects.filter(s => s.sem <= selectedSem);
+            const cgpa = calculateGPA(allSubjectsUpToNow);
+
+            const semNum = parseInt(selectedSem);
+            const isOdd = semNum % 2 !== 0;
+            const semLabel = semNum === 1 ? 'FIRST' : semNum === 2 ? 'SECOND' : semNum === 3 ? 'THIRD' : semNum === 4 ? 'FOURTH' : semNum === 5 ? 'FIFTH' : semNum === 6 ? 'SIXTH' : semNum === 7 ? 'SEVENTH' : 'EIGHTH';
+
+            let subjectsHtml = '';
+            semesterSubjects.forEach(sub => {
+                subjectsHtml += `
+                    <tr>
+                        <td>${selectedSem}</td>
+                        <td style="text-align: left;">${sub.code || 'N/A'}</td>
+                        <td style="text-align: left;">${sub.name || 'N/A'}</td>
+                        <td>${sub.credit || '0'}</td>
+                        <td>${sub.result || 'PASS'}</td>
+                        <td>${sub.grade || 'N/A'}</td>
+                        <td>${sub.gp || '0.0'}</td>
+                    </tr>
+                `;
+            });
+
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <div class="main-container" style="margin: 0; border: none; box-shadow: none; border-radius: 8px; overflow: hidden;">
+                    <header class="header">
+                        <div class="college-info">
+                            <h1>KGiSL Institute of Technology</h1>
+                            <p>Affiliated to Anna University, Approved by AICTE, Recognised by UGC, Accredited by NAAC & NBA</p>
+                        </div>
+                        <div class="user-profile">
+                            <div class="profile-pic">
+                                <img src="https://via.placeholder.com/40" alt="Profile">
+                            </div>
+                            <div class="user-info">
+                                <span>User : ${currentViewingStudent.name}</span>
+                                <span>Roll No. : ${currentViewingStudent.roll}</span>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div class="disclaimer-box">
+                        <strong>Disclaimer :</strong> The college is not responsible for any inadvertent error that may have crept in the results being published on Net. The results published on Net are for immediate information to the students. These cannot be treated as original mark sheets.
+                    </div>
+
+                    <div style="padding: 0 40px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <div id="modal-sem-tabs" style="display: flex; gap: 5px;">
+                            ${[...new Set(currentViewingStudent.subjects.map(s => s.sem))].sort((a, b) => a - b).map(sem => `
+                                <div onclick="changeDetailsSemester('${sem}')" style="padding: 4px 10px; font-size: 0.7rem; cursor: pointer; background: ${sem == selectedSem ? 'var(--primary-green)' : '#eee'}; color: ${sem == selectedSem ? 'white' : '#333'}; border-radius: 4px;">SEM ${sem}</div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="results-title-bar">
+                        RESULTS OF ${semLabel} SEMESTER : [2024 - ${isOdd ? 'ODD' : 'EVEN'} SEMESTER - END SEMESTER]
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Sem</th>
+                                <th style="text-align: left;">Course Code</th>
+                                <th style="text-align: left;">Name of the Course</th>
+                                <th>Credit</th>
+                                <th>Result</th>
+                                <th>GR.</th>
+                                <th>G.P.</th>
+                            </tr>
+                        </thead>
+                        <tbody>${subjectsHtml || '<tr><td colspan="7" style="text-align:center">No data for this semester</td></tr>'}</tbody>
+                    </table>
+
+                    <div class="gpa-footer">
+                        Semester Grade Point Average (SGPA) : <span>${sgpa}</span><br>
+                        Cumulative Grade Point Average (CGPA) : <span>${cgpa}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function changeDetailsSemester(sem) {
+            renderStudentDetails(sem);
+        }
+
+        function viewDetails(roll) {
+            currentViewingStudent = allData.find(s => s.roll === roll);
+            if (!currentViewingStudent) return;
+
+            const modal = document.getElementById('details-modal');
+            const availableSems = [...new Set(currentViewingStudent.subjects.map(s => s.sem))].sort((a, b) => a - b);
+            const initialSem = availableSems[availableSems.length - 1] || 1;
+
+            renderStudentDetails(initialSem);
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('details-modal').style.display = 'none';
+        }
+
+        window.onclick = function (event) {
+            const modal = document.getElementById('details-modal');
+            if (event.target == modal) closeModal();
+        }
+
+        window.onload = () => {
+            updateSummary();
+            filterStudents();
+        };
+    </script>
+</body>
+
+</html>

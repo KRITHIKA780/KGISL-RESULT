@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Results - KGISL Institute of Technology</title>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-icon">🏠</div>
+        <div class="sidebar-icon">📝</div>
+        <div class="sidebar-icon">💳</div>
+        <div class="sidebar-icon">📅</div>
+        <div class="sidebar-icon">⚙️</div>
+    </div>
+
+    <div class="main-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="college-info">
+                <h1>KGiSL Institute of Technology</h1>
+                <p>Affiliated to Anna University, Approved by AICTE, Recognised by UGC, Accredited by NAAC & NBA</p>
+            </div>
+            <div class="user-profile">
+                <div class="profile-pic">
+                    <img src="https://via.placeholder.com/40" alt="Profile">
+                </div>
+                <div class="user-info">
+                    <span id="display-name">User : KRITHIKA N</span>
+                    <span id="display-roll">Roll No. : 24UAM126</span>
+                    <a href="index.html" class="logout-btn">LOGOUT</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer-box">
+            <strong>Disclaimer :</strong> The college is not responsible for any inadvertent error that may have crept
+            in the results being published on Net. The results published on Net are for immediate information to the
+            students. These cannot be treated as original mark sheets.
+        </div>
+
+        <!-- Semantic Semester Tabs -->
+        <div id="sem-tabs" style="padding: 0 40px; margin-bottom: 10px; display: flex; gap: 5px;">
+            <!-- Populated by JS -->
+        </div>
+
+        <!-- Purple Title Bar -->
+        <div class="results-title-bar" id="sem-title">
+            RESULTS OF FIRST SEMESTER : [2024 - ODD SEMESTER - END SEMESTER]
+        </div>
+
+        <!-- Results Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Sem</th>
+                    <th style="text-align: left;">Course Code</th>
+                    <th style="text-align: left;">Name of the Course</th>
+                    <th>Credit</th>
+                    <th>Result</th>
+                    <th>GR.</th>
+                    <th>G.P.</th>
+                </tr>
+            </thead>
+            <tbody id="results-body">
+                <!-- Dynamic subjects -->
+            </tbody>
+        </table>
+
+        <!-- Center Blue GPA Display -->
+        <div class="gpa-footer">
+            Semester Grade Point Average (SGPA) : <span id="display-sgpa">8.17</span><br>
+            Cumulative Grade Point Average (CGPA) : <span id="display-cgpa">8.17</span>
+        </div>
+
+        <!-- Performance Analysis Section -->
+        <div class="analysis-container" id="analysis-section" style="justify-content: center;">
+            <div class="analysis-card percentage-card" style="width: 100%; max-width: 400px;">
+                <div class="label">Semester Percentage</div>
+                <div class="value" id="analysis-percentage">81.7%</div>
+                <p id="performance-status" style="font-size: 0.8rem; font-weight: 600; margin-top: 5px; color: #555;">
+                    Status: Excellent</p>
+            </div>
+        </div>
+
+        <footer style="text-align: center; color: #888; font-size: 0.7rem; margin: 20px 0;">
+            Powered by KGISL Portal &copy; 2024
+        </footer>
+    </div>
+
+    <script>
+        let studentData = null;
+
+        function calculateGPA(subjects) {
+            if (!subjects || subjects.length === 0) return "0.00";
+            let totalPoints = 0;
+            let totalCredits = 0;
+            subjects.forEach(sub => {
+                const credit = parseFloat(sub.credit) || 0;
+                const gp = parseFloat(sub.gp) || 0;
+                totalPoints += (credit * gp);
+                totalCredits += credit;
+            });
+            return totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : "0.00";
+        }
+
+        function renderResults(selectedSem) {
+            if (!studentData) return;
+
+            const semNum = parseInt(selectedSem);
+            const isOdd = semNum % 2 !== 0;
+            const semLabel = semNum === 1 ? 'FIRST' : semNum === 2 ? 'SECOND' : semNum === 3 ? 'THIRD' : semNum === 4 ? 'FOURTH' : semNum === 5 ? 'FIFTH' : semNum === 6 ? 'SIXTH' : semNum === 7 ? 'SEVENTH' : 'EIGHTH';
+
+            document.getElementById('sem-title').innerText = `RESULTS OF ${semLabel} SEMESTER : [2024 - ${isOdd ? 'ODD' : 'EVEN'} SEMESTER - END SEMESTER]`;
+
+            const semesterSubjects = studentData.subjects.filter(s => s.sem == selectedSem);
+            const sgpa = calculateGPA(semesterSubjects);
+
+            const allSubjectsUpToNow = studentData.subjects.filter(s => s.sem <= selectedSem);
+            const cgpa = calculateGPA(allSubjectsUpToNow);
+
+            document.getElementById('display-sgpa').innerText = sgpa;
+            document.getElementById('display-cgpa').innerText = cgpa;
+
+            const tbody = document.getElementById('results-body');
+            tbody.innerHTML = '';
+            semesterSubjects.forEach(sub => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${selectedSem}</td>
+                    <td>${sub.code || 'N/A'}</td>
+                    <td>${sub.name || 'N/A'}</td>
+                    <td>${sub.credit || '0'}</td>
+                    <td>${sub.result || 'PASS'}</td>
+                    <td>${sub.grade || 'N/A'}</td>
+                    <td>${sub.gp || '0.0'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Update Analysis Section
+            const percentageVal = (parseFloat(sgpa) * 10).toFixed(1);
+            document.getElementById('analysis-percentage').innerText = `${percentageVal}%`;
+
+            let status = "Excellent";
+            if (percentageVal < 50) status = "Needs Improvement";
+            else if (percentageVal < 75) status = "Good";
+            else if (percentageVal < 90) status = "Very Good";
+            document.getElementById('performance-status').innerText = `Status: ${status}`;
+        }
+
+        function selectTab(sem, element) {
+            document.querySelectorAll('#sem-tabs div').forEach(t => {
+                t.style.background = '#eee';
+                t.style.color = '#333';
+            });
+            element.style.background = 'var(--primary-green)';
+            element.style.color = 'white';
+            renderResults(sem);
+        }
+
+        window.onload = () => {
+            const fixedData = {
+                roll: '24UAM126',
+                name: 'KRITHIKA N',
+                subjects: [
+                    { sem: 1, code: '24UTA161', name: 'Heritage of Tamils', credit: '1.00', result: 'PASS', grade: 'A', gp: '8.00' },
+                    { sem: 1, code: '24UEN171', name: 'Communicative English for Engineers and Professionals - I', credit: '3.00', result: 'PASS', grade: 'B+', gp: '7.00' },
+                    { sem: 1, code: '24UMA161', name: 'Calculus and Matrix Algebra', credit: '4.00', result: 'PASS', grade: 'A', gp: '8.00' },
+                    { sem: 1, code: '24UPY171', name: 'Physics for Engineering and Technology', credit: '3.00', result: 'PASS', grade: 'A', gp: '8.00' },
+                    { sem: 1, code: '24UCH171', name: 'Engineering Chemistry', credit: '3.00', result: 'PASS', grade: 'A', gp: '8.00' },
+                    { sem: 1, code: '24UCS161', name: 'Computational Thinking', credit: '3.00', result: 'PASS', grade: 'A+', gp: '9.00' },
+                    { sem: 1, code: '24UCS171', name: 'Python Programming', credit: '4.00', result: 'PASS', grade: 'A', gp: '8.00' },
+                    { sem: 1, code: '24UME266', name: 'Engineering Practices Laboratory', credit: '2.00', result: 'PASS', grade: 'O', gp: '10.00' }
+                ]
+            };
+
+            let allData = JSON.parse(localStorage.getItem('kgisl_results') || '[]');
+            // Force update Krithika's data to ensure it's always right
+            const existingIdx = allData.findIndex(s => s.roll === '24UAM126');
+            if (existingIdx !== -1) {
+                allData[existingIdx] = fixedData;
+            } else {
+                allData.push(fixedData);
+            }
+            localStorage.setItem('kgisl_results', JSON.stringify(allData));
+
+            let roll = sessionStorage.getItem('loggedInRoll');
+            if (!roll) {
+                roll = '24UAM126';
+                sessionStorage.setItem('loggedInRoll', roll);
+            }
+
+            studentData = allData.find(s => s.roll === roll);
+
+            if (!studentData) {
+                alert("Results not found. Please contact Admin.");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const semTabs = document.getElementById('sem-tabs');
+            const availableSems = [...new Set(studentData.subjects.map(s => s.sem))].sort((a, b) => a - b);
+
+            if (availableSems.length === 0) {
+                semTabs.innerHTML = '<div>No Data</div>';
+            } else {
+                availableSems.forEach(sem => {
+                    const tab = document.createElement('div');
+                    tab.style.padding = '4px 10px';
+                    tab.style.fontSize = '0.7rem';
+                    tab.style.cursor = 'pointer';
+                    tab.style.background = '#eee';
+                    tab.style.borderRadius = '4px';
+                    tab.innerText = `SEM ${sem}`;
+                    tab.onclick = () => selectTab(sem, tab);
+                    semTabs.appendChild(tab);
+                });
+                semTabs.lastElementChild.click();
+            }
+
+            document.getElementById('display-name').innerText = `User : ${studentData.name}`;
+            document.getElementById('display-roll').innerText = `Roll No. : ${studentData.roll}`;
+        };
+    </script>
+</body>
+
+</html>

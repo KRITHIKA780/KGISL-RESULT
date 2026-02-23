@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KGISL Result Portal - Welcome</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+                url('Screenshot 2026-02-22 220532.png') no-repeat center center fixed !important;
+            background-size: cover !important;
+        }
+    </style>
+    <style>
+        .portal-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .portal-header {
+            margin-bottom: 50px;
+        }
+
+        .portal-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #ffffff;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .portal-header p {
+            font-size: 1.1rem;
+            color: #e0e0e0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .role-cards-container {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1000px;
+        }
+
+        .role-card {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 40px 30px;
+            border-radius: 8px;
+            width: 300px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-color: #00695c;
+        }
+
+        .role-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+
+        .role-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: #00695c;
+        }
+
+        .role-card p {
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .role-card {
+                width: 100%;
+                max-width: 350px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="portal-container">
+        <div class="portal-header">
+            <h1>KGISL PORTAL</h1>
+            <p>Official gateway for Academic Management and Results Publishing.</p>
+        </div>
+
+        <div class="role-cards-container">
+            <a href="index.html?role=student" class="role-card">
+                <div class="role-icon">🧑‍🎓</div>
+                <h2>STUDENT</h2>
+                <p>View your academic results, grades, and track your overall CGPA.</p>
+            </a>
+
+            <a href="index.html?role=faculty" class="role-card">
+                <div class="role-icon">👨‍🏫</div>
+                <h2>FACULTY</h2>
+                <p>Access student performance records and search through department data.</p>
+            </a>
+
+            <a href="index.html?role=admin" class="role-card">
+                <div class="role-icon">⚙️</div>
+                <h2>ADMIN</h2>
+                <p>Upload results, manage departments, and maintain the portal records.</p>
+            </a>
+        </div>
+
+        <div style="margin-top: 80px; font-size: 0.85rem; color: #777;">
+            &copy; 2024 KGISL Institute of Technology. All Rights Reserved.
+        </div>
+    </div>
+</body>
+
+</html>

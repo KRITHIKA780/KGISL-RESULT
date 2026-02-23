@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - KGISL Portal</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <div class="admin-meta">
+        <span>KGISL Portal Management</span>
+        <span>Role: Administrator</span>
+    </div>
+    <div class="main-container">
+        <header class="header">
+            <div class="college-info">
+                <h1>Admin Dashboard</h1>
+                <p>KGISL Institute of Technology - Result Management</p>
+            </div>
+            <div class="student-meta">
+                <span class="name">Administrator</span>
+                <a href="index.html" class="logout-btn">LOGOUT</a>
+            </div>
+        </header>
+
+        <!-- Year & Department Organization -->
+        <div class="admin-form-card" style="margin-top: 30px;">
+            <h3 style="margin-bottom: 15px; color: var(--primary-green); text-align: left;">1. SELECT ACADEMIC YEAR
+            </h3>
+            <div class="role-selector" style="margin-bottom: 20px;">
+                <div class="role-tab active" onclick="setYear(1, this)">1st YEAR</div>
+                <div class="role-tab" onclick="setYear(2, this)">2nd YEAR</div>
+                <div class="role-tab" onclick="setYear(3, this)">3rd YEAR</div>
+                <div class="role-tab" onclick="setYear(4, this)">4th YEAR</div>
+            </div>
+
+            <h3 style="margin-bottom: 15px; color: var(--primary-green); text-align: left;">2. SELECT SEMESTER</h3>
+
+            <div style="margin-bottom: 10px; font-weight: 600; color: #777; font-size: 0.8rem;">ODD SEMESTERS</div>
+            <div id="sem-selector-odd" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;">
+                <button class="action-btn secondary-btn sem-btn active" onclick="setSem(1, this)">SEM 1</button>
+                <button class="action-btn secondary-btn sem-btn" onclick="setSem(3, this)">SEM 3</button>
+                <button class="action-btn secondary-btn sem-btn" onclick="setSem(5, this)">SEM 5</button>
+                <button class="action-btn secondary-btn sem-btn" onclick="setSem(7, this)">SEM 7</button>
+            </div>
+
+            <div style="margin-bottom: 10px; font-weight: 600; color: #777; font-size: 0.8rem;">EVEN SEMESTERS</div>
+            <div id="sem-selector-even" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px;">
+                <button class="action-btn secondary-btn sem-btn" onclick="setSem(2, this)">SEM 2</button>
+                <button class="action-btn secondary-btn sem-btn" onclick="setSem(4, this)">SEM 4</button>
+                <button class="action-btn secondary-btn sem-btn" onclick="setSem(6, this)">SEM 6</button>
+                <button class="action-btn secondary-btn sem-btn" onclick="setSem(8, this)">SEM 8</button>
+            </div>
+
+            <h3 style="margin-bottom: 15px; color: var(--primary-green); text-align: left;">3. SELECT DEPARTMENT</h3>
+            <div id="dept-selector" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px;">
+                <button class="action-btn secondary-btn dept-btn active"
+                    onclick="setDept('B.E. Computer Science and Engineering', this)">B.E. CSE</button>
+                <button class="action-btn secondary-btn dept-btn"
+                    onclick="setDept('B.E. Electronics and Communication Engineering', this)">B.E. ECE</button>
+                <button class="action-btn secondary-btn dept-btn"
+                    onclick="setDept('B.E. Mechanical Engineering', this)">B.E. Mechanical</button>
+                <button class="action-btn secondary-btn dept-btn"
+                    onclick="setDept('B.Tech Artificial Intelligence and Data Science', this)">B.Tech AI&DS</button>
+                <button class="action-btn secondary-btn dept-btn"
+                    onclick="setDept('B.Tech Computer Science and Business Systems', this)">B.Tech CSBS</button>
+                <button class="action-btn secondary-btn dept-btn"
+                    onclick="setDept('B.Tech Information Technology', this)">B.Tech IT</button>
+                <button class="action-btn secondary-btn dept-btn"
+                    onclick="setDept('B.E. CSE (Artificial Intelligence and Machine Learning)', this)">B.E. CSE
+                    (AI&ML)</button>
+                <button class="action-btn secondary-btn dept-btn"
+                    onclick="setDept('B.E. CSE (Cybersecurity)', this)">B.E. Cybersecurity</button>
+            </div>
+
+            <h3 style="margin-bottom: 15px; color: var(--primary-green); text-align: left;">3. BULK UPLOAD</h3>
+            <div
+                style="border: 2.5px dashed var(--primary-green); background: #f0fdf4; text-align: center; padding: 30px; border-radius: 12px;">
+                <p style="font-size: 1rem; color: var(--text-slate); margin-bottom: 15px; font-weight: 600;">
+                    Upload results for <span id="target-selection"
+                        style="font-weight: 800; color: var(--primary-green);">1st YEAR - SEM 1 - B.E. Computer
+                        Science and Engineering</span>.
+                </p>
+                <div
+                    style="display: flex; flex-direction: column; gap: 15px; align-items: center; max-width: 500px; margin: 0 auto;">
+                    <input type="file" id="bulk-file" class="action-btn"
+                        style="background: white; border: 1px solid #ddd; width: 100%; cursor: pointer;">
+                    <button class="action-btn primary-btn" onclick="handleFileUpload()"
+                        style="width: 100%; padding: 15px; font-size: 1.1rem;">
+                        🚀 UPLOAD & TRANSFORM DATA
+                    </button>
+                </div>
+            </div>
+        </div> <!-- End of admin-form-card -->
+
+        <!-- Moved Outside Card for Visibility -->
+        <div class="title-bar" id="published-title" style="margin-top: 30px;">PUBLISHED RESULTS</div>
+
+        <div class="dashboard-actions" style="margin-top: 20px;">
+            <div class="search-bar">
+                <input type="text" id="admin-search" placeholder="Search students or courses..."
+                    onkeyup="filterAdminResults()">
+            </div>
+        </div>
+
+        <div class="results-table-container">
+            <table id="published-results-table">
+                <thead>
+                    <tr>
+                        <th>Roll No</th>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>SGPA</th>
+                        <th>CGPA</th>
+                        <th>Subjects</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="published-body">
+                    <!-- List of students -->
+                </tbody>
+            </table>
+            <div style="text-align: right; margin-top: 10px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="action-btn" onclick="localStorage.clear(); location.reload();"
+                    style="background: #666; font-size: 0.7rem;">RESET ALL STORAGE</button>
+                <button class="action-btn danger-btn" onclick="clearAllData()">CLEAR CATEGORY DATA</button>
+            </div>
+        </div>
+        <!-- Modal for student details (Synced with Faculty View) -->
+        <div id="details-modal"
+            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+            <div class="main-container" style="max-width: 800px; margin: 0; position:relative;">
+                <button onclick="closeModal()"
+                    style="position:absolute; right:20px; top:20px; font-size:2rem; background:none; border:none; color:white; cursor:pointer;">&times;</button>
+                <div id="modal-content"></div>
+            </div>
+        </div>
+    </div> <!-- End of main-container -->
+
+    <script>
+        // Pre-load dummy data if empty or outdated
+        function initializeDummyData() {
+            let existing = JSON.parse(localStorage.getItem('kgisl_results') || '[]');
+            const isOutdated = existing.length > 0 && existing.some(s => s.dept === "B.E. Computer Science");
+
+            if (existing.length === 0 || isOutdated) {
+                const initialData = [
+                    {
+                        roll: "711124104001", name: "AARTHI K", dept: "B.E. Computer Science and Engineering", year: 1, course: "B.E. Computer Science and Engineering", dob: "2006-05-19",
+                        subjects: [
+                            // Semester 1 (ODD)
+                            { code: "MA3151", name: "Matrices and Calculus", credit: "4", grade: "O", gp: "10.0", sem: 1 },
+                            { code: "PH3151", name: "Engineering Physics", credit: "3", grade: "A+", gp: "9.0", sem: 1 },
+                            { code: "CY3151", name: "Engineering Chemistry", credit: "3", grade: "A", gp: "8.0", sem: 1 },
+                            // Semester 2 (EVEN)
+                            { code: "MA3251", name: "Statistics and Numerical Methods", credit: "4", grade: "A+", gp: "9.0", sem: 2 },
+                            { code: "CS3251", name: "Programming in C", credit: "3", grade: "O", gp: "10.0", sem: 2 }
+                        ]
+                    },
+                    {
+                        roll: "711123106005", name: "BHAVANI M", dept: "B.Tech Information Technology", year: 2, course: "B.Tech Information Technology", dob: "2005-08-12",
+                        subjects: [
+                            // Semester 3 (ODD)
+                            { code: "CS3351", name: "Digital Principles and Systems", credit: "4", grade: "A+", gp: "9.0", sem: 3 },
+                            { code: "CS3301", name: "Data Structures", credit: "3", grade: "A", gp: "8.0", sem: 3 },
+                            // Semester 4 (EVEN)
+                            { code: "CS3401", name: "Algorithms", credit: "3", grade: "O", gp: "10.0", sem: 4 },
+                            { code: "CS3451", name: "Operating Systems", credit: "4", grade: "A+", gp: "9.0", sem: 4 }
+                        ]
+                    }
+                ];
+                localStorage.setItem('kgisl_results', JSON.stringify(initialData));
+            }
+        }
+
+        function scrollToResults() {
+            document.getElementById('published-title').scrollIntoView({ behavior: 'smooth' });
+        }
+
+
+        let currentYear = 1;
+        let currentSem = 1;
+        let currentDept = 'B.E. Computer Science and Engineering';
+
+        function setYear(year, element) {
+            currentYear = parseInt(year);
+            document.querySelectorAll('.role-selector .role-tab').forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+            updateTargetUI();
+            filterAdminResults();
+        }
+
+        function setSem(sem, element) {
+            currentSem = parseInt(sem);
+            document.querySelectorAll('.sem-btn').forEach(b => b.classList.remove('active'));
+            element.classList.add('active');
+            updateTargetUI();
+            filterAdminResults();
+        }
+
+        function setDept(dept, element) {
+            currentDept = dept;
+            document.querySelectorAll('.dept-btn').forEach(b => b.classList.remove('active'));
+            element.classList.add('active');
+            updateTargetUI();
+            filterAdminResults();
+        }
+
+        function updateTargetUI() {
+            const label = `${currentYear}${currentYear === 1 ? 'st' : currentYear === 2 ? 'nd' : currentYear === 3 ? 'rd' : 'th'} YEAR - SEM ${currentSem} - ${currentDept}`;
+            document.getElementById('target-selection').innerText = label;
+        }
+
+        function clearAllData() {
+            if (confirm(`Delete ALL data for ${currentYear} Year - ${currentDept}?`)) {
+                let allData = JSON.parse(localStorage.getItem('kgisl_results') || '[]');
+                allData = allData.filter(s => !(s.year === currentYear && s.dept === currentDept));
+                localStorage.setItem('kgisl_results', JSON.stringify(allData));
+                filterAdminResults();
+            }
+        }
+
+        function handleFileUpload() {
+            const fileInput = document.getElementById('bulk-file');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Please select a file first.");
+                return;
+            }
+
+            const reader = new FileReader();
+            const fileName = file.name.toLowerCase();
+            const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
+
+            reader.onload = function (e) {
+                let rawData = [];
+                try {
+                    if (isExcel) {
+                        const workbook = XLSX.read(e.target.result, { type: 'binary' });
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        rawData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                    } else {
+                        // Robust CSV Split with Quote Handling
+                        const rows = e.target.result.split(/\r?\n/);
+                        rawData = rows.filter(r => r.trim() !== '').map(row => {
+                            const result = [];
+                            let current = '';
+                            let inQuotes = false;
+                            for (let i = 0; i < row.length; i++) {
+                                let char = row[i];
+                                if (char === '"') inQuotes = !inQuotes;
+                                else if (char === ',' && !inQuotes) {
+                                    result.push(current.trim());
+                                    current = '';
+                                } else current += char;
+                            }
+                            result.push(current.trim());
+                            return result;
+                        });
+                    }
+                } catch (err) {
+                    alert("Error reading file. Please ensure it is a valid CSV or Excel file.");
+                    return;
+                }
+
+                if (rawData.length < 1) {
+                    alert("File is empty.");
+                    return;
+                }
+
+                // Find actual header row (some files have meta-data at top)
+                let headerIdx = -1;
+                const metaKeywords = ['roll', 'reg', 'id', 'name', 'subject', 'course', 'grade'];
+                for (let i = 0; i < Math.min(rawData.length, 10); i++) {
+                    const rowStr = rawData[i].join(' ').toLowerCase();
+                    if (metaKeywords.some(k => rowStr.includes(k))) {
+                        headerIdx = i;
+                        break;
+                    }
+                }
+
+                if (headerIdx === -1) {
+                    alert("Could not find a header row in the first 10 rows. Please ensure your file has labels like 'Roll No', 'Course', etc.");
+                    return;
+                }
+
+                const headerRow = rawData[headerIdx].map(h => String(h || '').toLowerCase().trim());
+                const dataRows = rawData.slice(headerIdx + 1);
+
+                const getStableIdx = (exactK, fuzzyK) => {
+                    let idx = headerRow.findIndex(h => exactK.includes(h));
+                    if (idx === -1) idx = headerRow.findIndex(h => fuzzyK.some(k => h.includes(k)));
+                    return idx;
+                };
+
+                const mapping = {
+                    roll: getStableIdx(['roll', 'roll no', 'roll number', 'reg no', 'reg number', 'id', 'register'], ['roll', 'reg', 'id']),
+                    name: getStableIdx(['student name', 'candidate name', 'name of the student'], ['student name', 'candidate', 'name']),
+                    dob: getStableIdx(['dob', 'date of birth', 'birth date'], ['dob', 'birth', 'date']),
+                    sgpa: getStableIdx(['sgpa', 'sem gpa', 'semester gpa'], ['sgpa', 'sem gpa']),
+                    cgpa: getStableIdx(['cgpa', 'cumulative gpa'], ['cgpa', 'cumulative']),
+                    code: getStableIdx(['code', 'subject code', 'sub code', 'course code', 'paper code'], ['code', 'subject', 'sub code']),
+                    subName: getStableIdx(['name of the course', 'subject name', 'course name', 'sub name', 'paper', 'subject', 'title', 'paper name', 'subject name'], ['name of the course', 'subject name', 'course name', 'sub name', 'paper', 'subject', 'title']),
+                    credit: getStableIdx(['credit', 'credits'], ['credit']),
+                    grade: getStableIdx(['grade'], ['grade']),
+                    gp: getStableIdx(['gp', 'grade point', 'g.p', 'gp.'], ['gp', 'point', 'g.p']),
+                    course: getStableIdx(['overall course', 'degree', 'branch', 'dept', 'program', 'specialization'], ['degree', 'branch', 'dept', 'program'])
+                };
+
+                // Final check: if subName still -1, try any column with 'course' in it (carefully)
+                if (mapping.subName === -1) {
+                    mapping.subName = headerRow.findIndex(h => h.includes('course') && !h.includes('code') && h !== 'course');
+                }
+
+                if (mapping.roll === -1 || mapping.name === -1) {
+                    const detectStr = headerRow.filter(h => h).join(', ');
+                    alert("Could not detect mandatory columns: 'Roll Number' AND 'Student Name'.\nFound headers: " + detectStr);
+                    return;
+                }
+
+                const studentMap = {};
+                dataRows.forEach((cols, idx) => {
+                    const getCol = (key) => mapping[key] !== -1 ? (cols[mapping[key]] || '') : '';
+
+                    const roll = String(getCol('roll'));
+                    const name = String(getCol('name'));
+                    if (!roll || !name) return; // Skip invalid rows
+
+                    if (!studentMap[roll]) {
+                        studentMap[roll] = {
+                            roll: roll,
+                            name: name,
+                            course: String(getCol('course') || currentDept),
+                            dob: String(getCol('dob')),
+                            sgpa: String(getCol('sgpa') || '0.00'),
+                            cgpa: String(getCol('cgpa') || '0.00'),
+                            year: currentYear,
+                            dept: currentDept,
+                            subjects: []
+                        };
+                    }
+
+                    if (mapping.code !== -1 || mapping.subName !== -1) {
+                        studentMap[roll].subjects.push({
+                            code: String(getCol('code')),
+                            name: String(getCol('subName')),
+                            credit: String(getCol('credit')),
+                            grade: String(getCol('grade')),
+                            gp: String(getCol('gp')),
+                            sem: currentSem,
+                            result: 'PASS'
+                        });
+                    }
+                });
+
+                let allData = JSON.parse(localStorage.getItem('kgisl_results') || '[]');
+                const newStudents = Object.values(studentMap);
+
+                if (newStudents.length === 0) {
+                    alert("No valid data rows found after the header. Please check your data format.");
+                    return;
+                }
+
+                newStudents.forEach(newStu => {
+                    const existingIdx = allData.findIndex(s => s.roll === newStu.roll);
+                    if (existingIdx !== -1) {
+                        // Merge Subjects while avoiding duplicates (same code + same sem)
+                        newStu.subjects.forEach(newSub => {
+                            const isDuplicate = allData[existingIdx].subjects.some(
+                                s => s.code === newSub.code && s.sem === newSub.sem
+                            );
+                            if (!isDuplicate) {
+                                allData[existingIdx].subjects.push(newSub);
+                            }
+                        });
+                        // Optionally update basic info if it's not a placeholder
+                        if (newStu.dob) allData[existingIdx].dob = newStu.dob;
+                        // Always update SGPA/CGPA to the latest found in the file
+                        if (newStu.sgpa && newStu.sgpa !== '0.00') allData[existingIdx].sgpa = newStu.sgpa;
+                        if (newStu.cgpa && newStu.cgpa !== '0.00') allData[existingIdx].cgpa = newStu.cgpa;
+                    } else {
+                        allData.push(newStu);
+                    }
+                });
+
+                localStorage.setItem('kgisl_results', JSON.stringify(allData));
+
+                // Update UI Immediately
+                filterAdminResults();
+
+                // Show Success Notification
+                const title = document.getElementById('published-title');
+                if (title) {
+                    const originalText = title.innerText;
+                    title.innerText = `✅ DATA PUBLISHED SUCCESSFULLY - ${newStudents.length} RECORDS ADDED`;
+                    title.style.backgroundColor = "#ffc107"; // Highlight
+                    title.style.color = "#000";
+
+                    setTimeout(() => {
+                        title.innerText = originalText;
+                        title.style.backgroundColor = "";
+                        title.style.color = "";
+                    }, 4000);
+                }
+
+                // Auto Scroll to Results
+                const table = document.getElementById('published-results-table');
+                if (table) table.scrollIntoView({ behavior: 'smooth' });
+
+                // Show mapping report
+                const foundCols = Object.keys(mapping).filter(k => mapping[k] !== -1).map(k => k.toUpperCase());
+                console.log(`Successfully Imported ${newStudents.length} Students! Detected: ${foundCols.join(', ')}`);
+            };
+
+            if (isExcel) {
+                reader.readAsBinaryString(file);
+            } else {
+                reader.readAsText(file);
+            }
+        }
+
+        function deleteStudent(roll) {
+            let allData = JSON.parse(localStorage.getItem('kgisl_results') || '[]');
+            allData = allData.filter(s => s.roll !== roll);
+            localStorage.setItem('kgisl_results', JSON.stringify(allData));
+            filterAdminResults();
+        }
+
+        function renderAdminTable(data) {
+            const publishedBody = document.getElementById('published-body');
+            if (!publishedBody) return;
+            publishedBody.innerHTML = '';
+
+            if (data.length === 0) {
+                publishedBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #777;">
+                    <strong>NO RECORDS FOUND</strong><br>
+                    Category: ${currentYear}${currentYear === 1 ? 'st' : 'th'} Year - Sem ${currentSem} - ${currentDept}<br>
+                    <span style="font-size: 0.8rem">Please upload the Result File for this specific category.</span>
+                </td></tr>`;
+                return;
+            }
+
+            data.forEach(student => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                        <td>${student.roll}</td>
+                        <td>${student.name}</td>
+                        <td>${student.course || 'N/A'}</td>
+                        <td>${student.sgpa}</td>
+                        <td>${student.cgpa}</td>
+                        <td style="font-weight: 700;">${student.subjects.length} Subjects</td>
+                        <td style="display: flex; gap: 5px; justify-content: center;">
+                            <button onclick="viewDetails('${student.roll}')" class="action-btn secondary-btn" style="padding: 4px 8px; font-size: 0.7rem; background: #e0f2f1; color: #00695c; border-color: #00695c;">View</button>
+                            <button onclick="deleteStudent('${student.roll}')" class="action-btn danger-btn" style="padding: 4px 8px; font-size: 0.7rem">Delete</button>
+                        </td>
+                    `;
+                publishedBody.appendChild(tr);
+            });
+        }
+
+        // --- Details Modal Logic (Synced with Faculty) ---
+        let currentViewingStudent = null;
+
+        function calculateGPA(subjects) {
+            if (!subjects || subjects.length === 0) return "0.00";
+            let totalPoints = 0;
+            let totalCredits = 0;
+            subjects.forEach(sub => {
+                const credit = parseFloat(sub.credit) || 0;
+                const gp = parseFloat(sub.gp) || 0;
+                totalPoints += (credit * gp);
+                totalCredits += credit;
+            });
+            return totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : "0.00";
+        }
+
+        function renderStudentDetails(selectedSem) {
+            if (!currentViewingStudent) return;
+            const semesterSubjects = currentViewingStudent.subjects.filter(s => s.sem == selectedSem);
+            const sgpa = calculateGPA(semesterSubjects);
+            const allSubjectsUpToNow = currentViewingStudent.subjects.filter(s => s.sem <= selectedSem);
+            const cgpa = calculateGPA(allSubjectsUpToNow);
+            const semNum = parseInt(selectedSem);
+            const isOdd = semNum % 2 !== 0;
+            const semLabel = semNum === 1 ? 'FIRST' : semNum === 2 ? 'SECOND' : semNum === 3 ? 'THIRD' : semNum === 4 ? 'FOURTH' : semNum === 5 ? 'FIFTH' : semNum === 6 ? 'SIXTH' : semNum === 7 ? 'SEVENTH' : 'EIGHTH';
+
+            let subjectsHtml = '';
+            semesterSubjects.forEach(sub => {
+                subjectsHtml += `<tr><td>${selectedSem}</td><td style="text-align: left;">${sub.code || 'N/A'}</td><td style="text-align: left;">${sub.name || 'N/A'}</td><td>${sub.credit || '0'}</td><td>${sub.result || 'PASS'}</td><td>${sub.grade || 'N/A'}</td><td>${sub.gp || '0.0'}</td></tr>`;
+            });
+
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <div class="main-container" style="margin: 0; border: none; box-shadow: none; border-radius: 8px; overflow: hidden; background: white;">
+                    <header class="header">
+                        <div class="college-info"><h1>KGiSL Institute of Technology</h1><p>Academic Management System - Internal View</p></div>
+                        <div class="user-profile"><div class="user-info"><span>Student : ${currentViewingStudent.name}</span><span>Roll No. : ${currentViewingStudent.roll}</span></div></div>
+                    </header>
+                    <div style="padding: 15px 40px; display: flex; gap: 5px;">
+                        ${[...new Set(currentViewingStudent.subjects.map(s => s.sem))].sort((a, b) => a - b).map(sem => `
+                            <div onclick="changeDetailsSemester('${sem}')" style="padding: 4px 10px; font-size: 0.7rem; cursor: pointer; background: ${sem == selectedSem ? 'var(--primary-green)' : '#eee'}; color: ${sem == selectedSem ? 'white' : '#333'}; border-radius: 4px;">SEM ${sem}</div>
+                        `).join('')}
+                    </div>
+                    <div class="results-title-bar">RESULTS OF ${semLabel} SEMESTER : [2024 - ${isOdd ? 'ODD' : 'EVEN'} SEMESTER]</div>
+                    <table>
+                        <thead><tr><th>Sem</th><th>Course Code</th><th>Name of the Course</th><th>Credit</th><th>Result</th><th>GR.</th><th>G.P.</th></tr></thead>
+                        <tbody>${subjectsHtml || '<tr><td colspan="7">No data</td></tr>'}</tbody>
+                    </table>
+                    <div class="gpa-footer">Semester GPA : ${sgpa} | Cumulative GPA : ${cgpa}</div>
+                </div>`;
+        }
+
+        function changeDetailsSemester(sem) { renderStudentDetails(sem); }
+        function viewDetails(roll) {
+            const allData = JSON.parse(localStorage.getItem('kgisl_results') || '[]');
+            currentViewingStudent = allData.find(s => s.roll === roll);
+            if (!currentViewingStudent) return;
+            const availableSems = [...new Set(currentViewingStudent.subjects.map(s => s.sem))].sort((a, b) => a - b);
+            renderStudentDetails(availableSems[availableSems.length - 1] || 1);
+            document.getElementById('details-modal').style.display = 'flex';
+        }
+        function closeModal() { document.getElementById('details-modal').style.display = 'none'; }
+
+        function filterAdminResults() {
+            const searchInput = document.getElementById('admin-search');
+            const query = searchInput ? searchInput.value.toLowerCase() : '';
+            const allData = JSON.parse(localStorage.getItem('kgisl_results') || '[]');
+
+            const filtered = allData.filter(s => {
+                const matchesCategory = (Number(s.year) === Number(currentYear)) && (s.dept === currentDept);
+                const matchesQuery = s.roll.toLowerCase().includes(query) ||
+                    s.name.toLowerCase().includes(query);
+
+                // Only show student if they have data for the currently selected semester
+                const hasSemData = s.subjects.some(sub => Number(sub.sem) === Number(currentSem));
+                return matchesCategory && matchesQuery && hasSemData;
+            });
+            renderAdminTable(filtered);
+        }
+
+        // Load existing
+        window.onload = () => {
+            initializeDummyData();
+            updateTargetUI();
+            filterAdminResults();
+        };
+    </script>
+</body>
+
+</html>
