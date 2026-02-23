@@ -365,9 +365,17 @@
                     return;
                 }
 
+                let updatedCount = 0;
+                let addedCount = 0;
+                let subjectsAdded = 0;
+
                 newStudents.forEach(newStu => {
                     const existingIdx = allData.findIndex(s => s.roll === newStu.roll);
                     if (existingIdx !== -1) {
+                        // UPDATE CATEGORY: Ensure student shows up in the current view
+                        allData[existingIdx].year = currentYear;
+                        allData[existingIdx].dept = currentDept;
+
                         // Merge Subjects while avoiding duplicates (same code + same sem)
                         newStu.subjects.forEach(newSub => {
                             const isDuplicate = allData[existingIdx].subjects.some(
@@ -375,15 +383,20 @@
                             );
                             if (!isDuplicate) {
                                 allData[existingIdx].subjects.push(newSub);
+                                subjectsAdded++;
                             }
                         });
-                        // Optionally update basic info if it's not a placeholder
+                        // Update basic info if provided
+                        if (newStu.name) allData[existingIdx].name = newStu.name;
                         if (newStu.dob) allData[existingIdx].dob = newStu.dob;
-                        // Always update SGPA/CGPA to the latest found in the file
+                        if (newStu.course) allData[existingIdx].course = newStu.course;
                         if (newStu.sgpa && newStu.sgpa !== '0.00') allData[existingIdx].sgpa = newStu.sgpa;
                         if (newStu.cgpa && newStu.cgpa !== '0.00') allData[existingIdx].cgpa = newStu.cgpa;
+                        updatedCount++;
                     } else {
                         allData.push(newStu);
+                        addedCount++;
+                        subjectsAdded += newStu.subjects.length;
                     }
                 });
 
@@ -392,19 +405,19 @@
                 // Update UI Immediately
                 filterAdminResults();
 
-                // Show Success Notification
+                // Show Detailed Success Notification
                 const title = document.getElementById('published-title');
                 if (title) {
                     const originalText = title.innerText;
-                    title.innerText = `✅ DATA PUBLISHED SUCCESSFULLY - ${newStudents.length} RECORDS ADDED`;
-                    title.style.backgroundColor = "#ffc107"; // Highlight
+                    title.innerText = `✅ SUCCESS: ${addedCount} New, ${updatedCount} Updated (${subjectsAdded} Subjects Added)`;
+                    title.style.backgroundColor = "#ffc107";
                     title.style.color = "#000";
 
                     setTimeout(() => {
                         title.innerText = originalText;
                         title.style.backgroundColor = "";
                         title.style.color = "";
-                    }, 4000);
+                    }, 5000);
                 }
 
                 // Auto Scroll to Results
